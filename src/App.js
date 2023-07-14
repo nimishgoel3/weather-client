@@ -1,27 +1,46 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import './App.css'; // Import the CSS file here
+import React, { useState } from "react";
+import axios from "axios";
+import "./App.css"; // Import the CSS file here
+
+const API_URL = "https://jade-gorgeous-foal.cyclic.app";
 
 function App() {
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchWeather = async () => {
+    if (!city) return;
+    setLoading(true);
     try {
-      const { data } = await axios.get(`http://localhost:5001/api/weather/${city}`);
+      const { data } = await axios.get(`${API_URL}/api/weather/${city}`);
+      setLoading(false);
       setWeather(data);
     } catch (error) {
       console.error(error);
+      setLoading(false);
+      setWeather(null);
+      alert("City not found. Please try again...");
     }
   };
 
   return (
     <div className="App">
       <div className="input-section">
-        <input className="input-field" type="text" onChange={e => setCity(e.target.value)} placeholder="Enter city name..." />
-        <button className="fetch-button" onClick={fetchWeather}>Get Weather</button>
+        <input
+          className="input-field"
+          type="text"
+          placeholder="Enter city name..."
+          onChange={(e) => setCity(e.target.value)}
+        />
+        <button
+          className="fetch-button"
+          onClick={fetchWeather}
+          disabled={loading}
+        >
+          {loading ? "Loading..." : "Get Weather"}
+        </button>
       </div>
-
       {weather && (
         <div className="weather-info">
           <h1>{weather.name}</h1>
